@@ -5,11 +5,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.internal.EverythingIsNonNull;
 
-public class BaseCallBack <T> implements Callback <T> {
+public class CallbackComRetorno<T> implements Callback<T> {
 
-    private final RespostaCallBack <T> callBack;
+    private final RespostaCallBack<T> callBack;
 
-    public BaseCallBack(RespostaCallBack <T> callBack) {
+    public CallbackComRetorno(RespostaCallBack<T> callBack) {
         this.callBack = callBack;
     }
 
@@ -33,8 +33,9 @@ public class BaseCallBack <T> implements Callback <T> {
         callBack.quandoFalha("Falha de comunicação: " + t.getMessage());
     }
 
-    public interface RespostaCallBack <T> {
+    public interface RespostaCallBack<T> {
         void quandoSucesso(T resultado);
+
         void quandoFalha(String erro);
     }
 }
