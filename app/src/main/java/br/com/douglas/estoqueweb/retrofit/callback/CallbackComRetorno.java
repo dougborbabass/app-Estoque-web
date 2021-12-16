@@ -5,7 +5,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.internal.EverythingIsNonNull;
 
+import static br.com.douglas.estoqueweb.retrofit.callback.MensagensCallback.FALHA_DE_COMUNICACAO;
+import static br.com.douglas.estoqueweb.retrofit.callback.MensagensCallback.RESPOSTA_NAO_SUCEDIDA;
+
 public class CallbackComRetorno<T> implements Callback<T> {
+
 
     private final RespostaCallBack<T> callBack;
 
@@ -22,7 +26,7 @@ public class CallbackComRetorno<T> implements Callback<T> {
             if (resultado != null) {
                 callBack.quandoSucesso(resultado);
             } else {
-                callBack.quandoFalha("Resposta não sucedida");
+                callBack.quandoFalha(RESPOSTA_NAO_SUCEDIDA);
             }
         }
     }
@@ -30,7 +34,7 @@ public class CallbackComRetorno<T> implements Callback<T> {
     @Override
     @EverythingIsNonNull
     public void onFailure(Call<T> call, Throwable t) {
-        callBack.quandoFalha("Falha de comunicação: " + t.getMessage());
+        callBack.quandoFalha(FALHA_DE_COMUNICACAO + t.getMessage());
     }
 
     public interface RespostaCallBack<T> {

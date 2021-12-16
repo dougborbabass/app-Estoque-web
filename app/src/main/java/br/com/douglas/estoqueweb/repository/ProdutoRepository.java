@@ -1,8 +1,11 @@
 package br.com.douglas.estoqueweb.repository;
 
+import android.content.Context;
+
 import java.util.List;
 
 import br.com.douglas.estoqueweb.asynctask.BaseAsyncTask;
+import br.com.douglas.estoqueweb.database.EstoqueDatabase;
 import br.com.douglas.estoqueweb.database.dao.ProdutoDAO;
 import br.com.douglas.estoqueweb.model.Produto;
 import br.com.douglas.estoqueweb.retrofit.EstoqueRetrofit;
@@ -16,8 +19,9 @@ public class ProdutoRepository {
     private final ProdutoDAO dao;
     private final ProdutoService service;
 
-    public ProdutoRepository(ProdutoDAO dao) {
-        this.dao = dao;
+    public ProdutoRepository(Context context) {
+        EstoqueDatabase db = EstoqueDatabase.getInstance(context);
+        dao = db.getProdutoDAO();
         service = new EstoqueRetrofit().getProdutoService();
     }
 
