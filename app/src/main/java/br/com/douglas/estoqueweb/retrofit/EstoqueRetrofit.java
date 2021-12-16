@@ -18,7 +18,7 @@ public class EstoqueRetrofit {
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://602e-2804-14d-4c89-89c4-5046-d739-200f-e2ea.ngrok.io/")
+                .baseUrl("http://9b30-189-6-250-117.ngrok.io/")
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
