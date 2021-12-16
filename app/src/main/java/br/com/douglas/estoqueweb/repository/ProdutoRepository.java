@@ -2,8 +2,6 @@ package br.com.douglas.estoqueweb.repository;
 
 import android.os.AsyncTask;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -27,32 +25,48 @@ public class ProdutoRepository {
         service = new EstoqueRetrofit().getProdutoService();
     }
 
-    public void buscaProdutos(DadosCarregadosListener<List<Produto>> listener) {
-        buscaProdutosInternos(listener);
+    public void buscaProdutos(DadosCarregadosCallBack<List<Produto>> callBack) {
+        buscaProdutosInternos(callBack);
     }
 
-    private void buscaProdutosInternos(DadosCarregadosListener<List<Produto>> listener) {
+    private void buscaProdutosInternos(DadosCarregadosCallBack<List<Produto>> callBack) {
         new BaseAsyncTask<>(dao::buscaTodos,
                 resultado -> {
-                    listener.quandoCarregados(resultado);
-                    buscaProdutosNaAPI(listener);
+                    callBack.quandoSucesso(resultado);
+                    buscaProdutosNaAPI(callBack);
                 }).execute();
     }
 
-    private void buscaProdutosNaAPI(DadosCarregadosListener<List<Produto>> listener) {
-
+    private void buscaProdutosNaAPI(DadosCarregadosCallBack<List<Produto>> callBack) {
         Call<List<Produto>> call = service.buscaTodos();
-        new BaseAsyncTask<>(() -> {
-            try {
-                Response<List<Produto>> resposta = call.execute();
-                List<Produto> produtosNovos = resposta.body();
-                dao.salva(produtosNovos);
-            } catch (IOException e) {
-                e.printStackTrace();
+
+        call.enqueue(new Callback<List<Produto>>() {
+            @Override
+            @EverythingIsNonNull
+            public void onResponse(Call<List<Produto>> call, Response<List<Produto>> response) {
+                if (response.isSuccessful()) {
+                    List<Produto> produtosNovos = response.body();
+                    if (produtosNovos != null) {
+                        atualizaInterno(produtosNovos, callBack);
+                    } else {
+                        callBack.quandoFalha("Resposta não sucedida");
+                    }
+                }
             }
+
+            @Override
+            @EverythingIsNonNull
+            public void onFailure(Call<List<Produto>> call, Throwable t) {
+                callBack.quandoFalha("Falha de comunicação: " + t.getMessage());
+            }
+        });
+    }
+
+    private void atualizaInterno(List<Produto> produtosNovos, DadosCarregadosCallBack<List<Produto>> callBack) {
+        new BaseAsyncTask<>(() -> {
+            dao.salva(produtosNovos);
             return dao.buscaTodos();
-        }, listener::quandoCarregados)
-                .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }, callBack::quandoSucesso).execute();
     }
 
     public void salva(Produto produto, DadosCarregadosCallBack<Produto> callBack) {
@@ -88,12 +102,9 @@ public class ProdutoRepository {
         }, callBack::quandoSucesso).execute();
     }
 
-    public interface DadosCarregadosListener<T> {
-        void quandoCarregados(T resultado);
-    }
-
     public interface DadosCarregadosCallBack<T> {
         void quandoSucesso(T resultado);
+
         void quandoFalha(String erro);
     }
 
