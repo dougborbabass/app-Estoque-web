@@ -1,5 +1,5 @@
 # app-Estoque-web
-CRUD de produtos em estoque com foco no estudo de persistência de dados na web
+CRUD de produtos em estoque com foco no estudo de persistência e consumo de dados na web utilizando o RETROFIT
 
 ### API Subida em localhost 
 - Para utilizar a API executar:
